@@ -52,11 +52,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Dependencies
 
-{net/http}[http://ruby-doc.org/stdlib-2.3.0/libdoc/net/http/rdoc/Net/HTTP.html]
-
-{uri}[http://ruby-doc.org/stdlib-2.3.0/libdoc/uri/rdoc/URI.html]
-
-{socksify}[http://socksify.rubyforge.org/]
+* [net/http](http://ruby-doc.org/stdlib-2.3.0/libdoc/net/http/rdoc/Net/HTTP.html)
+* [uri](http://ruby-doc.org/stdlib-2.3.0/libdoc/uri/rdoc/URI.html)
+* [socksify](http://socksify.rubyforge.org/)
 
 ## Contributing
 
