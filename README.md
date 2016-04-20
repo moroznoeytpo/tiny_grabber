@@ -1,6 +1,6 @@
 # TinyGrabber
 
-{<img src="https://badge.fury.io/rb/tiny_grabber.svg" alt="Gem Version" />}[https://badge.fury.io/rb/tiny_grabber]
+[<img src="https://badge.fury.io/rb/tiny_grabber.svg" alt="Gem Version" />](https://badge.fury.io/rb/tiny_grabber)
 
 The TinyGrabber library is used for grabbing remote websites.
 
@@ -45,6 +45,10 @@ p response.code
 # HTTP content
 p response.read_body
 ```
+
+## Changelog
+
+* *v0.0.4* Fix work with socks4(5) proxy
 
 ## Development
 
