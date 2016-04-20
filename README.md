@@ -1,5 +1,7 @@
 # TinyGrabber
 
+{<img src="https://badge.fury.io/rb/tiny_grabber.svg" alt="Gem Version" />}[https://badge.fury.io/rb/tiny_grabber]
+
 The TinyGrabber library is used for grabbing remote websites.
 
 ## Installation

@@ -2,7 +2,7 @@ require "tiny_grabber/version"
 
 require 'uri'
 require 'net/http'
-require 'socksify'
+require 'socksify/http'
 
 # Main class for TinyGrabber
 class TinyGrabber
@@ -29,12 +29,11 @@ class TinyGrabber
     uri = URI(url)
 
     params = convert_params_to_sym params
-
     if params[:proxy]
       # Socks4(5) proxy
-      if params[:proxy][:proxy_type] == :socks
+      if ['socks', :socks].include?(params[:proxy][:proxy_type])
         http = Net::HTTP.SOCKSProxy(params[:proxy][:ip], params[:proxy][:port])
-        # Http(s) proxy
+      # Http(s) proxy
       else
         http = Net::HTTP::Proxy(params[:proxy][:ip], params[:proxy][:port])
       end
