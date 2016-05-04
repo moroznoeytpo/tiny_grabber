@@ -3,6 +3,7 @@ require "tiny_grabber/version"
 require 'uri'
 require 'net/http'
 require 'socksify/http'
+require 'tiny_grabber/http'
 
 # Main class for TinyGrabber
 class TinyGrabber
@@ -26,7 +27,7 @@ class TinyGrabber
   # @param params Addition setting
   #
   def self.get url, params = {}
-    uri = URI(url)
+    uri = URI(URI.escape(url))
 
     params = convert_params_to_sym params
     if params[:proxy]

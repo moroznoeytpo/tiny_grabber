@@ -6,7 +6,8 @@ describe TinyGrabber do
   end
 
   it 'get page without proxy' do
-    responce = TinyGrabber.get 'https://www.google.ru/'
+    responce = TinyGrabber.get 'https://www.google.ru/?q=привет'
+    responce.ng
     expect(responce.code).to eq("200")
   end
 end

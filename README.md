@@ -25,10 +25,10 @@ Or install it yourself as:
 ```ruby
 #! /usr/bin/env ruby
 
-require 'tiny-grabber'
+require 'tiny_grabber'
 
 # Link to remote site
-url = 'https://github.com/moroznoeytpo/tiny-grabber'
+url = 'https://github.com/moroznoeytpo/tiny_grabber'
 
 # Set headers
 headers = { 'Content-Type' => 'application/json' }
@@ -43,12 +43,19 @@ response = TinyGrabber.get url, headers: headers, proxy: proxy
 p response.code
 
 # HTTP content
-p response.read_body
+p response.body
+
+# Nokogiri object
+p response.ng
 ```
 
 ## Changelog
 
-* *v0.0.4* Fix work with socks4(5) proxy
+* ### *v 0.0.5*
+    * Fix work with non ascii url
+    * Add new `ng` response method for getting Nokogiri object
+* ### *v 0.0.4*
+    * Fix work with socks4(5) proxy
 
 ## Development
 
