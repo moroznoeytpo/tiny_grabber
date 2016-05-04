@@ -51,7 +51,7 @@ p response.ng
 
 ## Changelog
 
-* ### *v 0.0.5*
+* ### *v 0.0.6*
     * Add Net::HTTPOK modify file for Nokogiri response
 * ### *v 0.0.5*
     * Fix work with non ascii url
