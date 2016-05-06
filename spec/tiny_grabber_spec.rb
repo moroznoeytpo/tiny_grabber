@@ -1,13 +1,24 @@
 require 'spec_helper'
 
 describe TinyGrabber do
+
   it 'has a version number' do
     expect(TinyGrabber::VERSION).not_to be nil
   end
 
-  it 'get page without proxy' do
-    responce = TinyGrabber.get 'https://www.google.ru/?q=привет'
-    responce.ng
-    expect(responce.code).to eq("200")
+  it 'HTTPS GET' do
+    response = TinyGrabber.get 'https://www.google.ru/search?q=привет'
+    expect(response.code).to eq("200")
+  end
+
+  it 'HTTP POST' do
+    response = TinyGrabber.get 'http://ras.arbitr.ru/Ras/Search',
+      headers: {
+          'Accept' => 'application/json',
+          'Host' => 'ras.arbitr.ru',
+          'X-Requested-With' => 'XMLHttpRequest'
+      },
+      post: { }
+    expect(response.code).to eq("200")
   end
 end

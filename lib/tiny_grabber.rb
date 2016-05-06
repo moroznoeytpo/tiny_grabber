@@ -12,13 +12,17 @@ class TinyGrabber
   # Get Net::HTTP object for content from remote single page
   # [url (string)] Link on content
   # [params (hash)] Addition setting
-  # * [proxy] Configuration of remote proxy server
+  # * [proxy (hash)] Configuration of remote proxy server
   #   * *ip* address of remote proxy server
   #   * *port* of remote proxy server
   #   * *proxy_type* of remote proxy server
   #     * *http* for http(s) proxy servers (by default)
   #     * *socks* for socks4/5 proxy servers
-  # * [headers] Headers
+  # * [headers (hash)] Headers
+  # * [auth (hash)] Basic Authentication
+  #   * *username* Authenticate username
+  #   * *password* Authenticate password
+  # * [post (hash)] POST data
   #
   # = Example
   #   TinyGrabber.get url, headers: { 'Content-Type' => 'application/json' }, proxy: { ip: 'xx.xx.xx.xx', port: xx, proxy_type: :socks }
@@ -30,25 +34,36 @@ class TinyGrabber
     uri = URI(URI.escape(url))
 
     params = convert_params_to_sym params
+
+    # Use proxy for request
     if params[:proxy]
-      # Socks4(5) proxy
       if ['socks', :socks].include?(params[:proxy][:proxy_type])
         http = Net::HTTP.SOCKSProxy(params[:proxy][:ip], params[:proxy][:port])
-      # Http(s) proxy
       else
         http = Net::HTTP::Proxy(params[:proxy][:ip], params[:proxy][:port])
       end
     else
       http = Net::HTTP
     end
-    response = http.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
-      request = Net::HTTP::Get.new uri
 
-      # Add headers
-      params[:headers].each { |k, v| request.add_field(k, v) } if params[:headers]
-      http.request request
+    # Set HTTP request type
+    if params[:post] or params.key?(:post)
+      request = Net::HTTP::Post.new(uri.request_uri)
+      request.set_form_data(params[:post])
+    else
+      request = Net::HTTP::Get.new(uri.request_uri)
     end
-    response
+
+    # Set Basic Auth
+    if params[:auth]
+      request.basic_auth params[:auth][:username], params[:auth][:password]
+    end
+
+    # Set headers
+    params[:headers].each { |k, v| request.add_field(String(k), v) } if params[:headers]
+
+    # Get response
+    http.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') { |http| http.request(request) }
   end
 
   private

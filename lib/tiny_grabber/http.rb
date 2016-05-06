@@ -10,5 +10,11 @@ module Net
     def ng
       Nokogiri::HTML(self.body)
     end
+
+    # Response Cookies
+    #
+    def cookies
+      self.get_fields('set-cookie')
+    end
   end
 end

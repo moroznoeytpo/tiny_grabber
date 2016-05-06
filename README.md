@@ -34,10 +34,18 @@ url = 'https://github.com/moroznoeytpo/tiny_grabber'
 headers = { 'Content-Type' => 'application/json' }
 
 # Set http(s)/socks4(5) proxy
+# Proxy type by default is http. You can change it to socks, with setting params proxy_type equal socks
 proxy = { ip: 'xx.xx.xx.xx', port: xx, proxy_type: :socks }
 
+# Set Basic Authentication
+auth = { username: '', password: '' }
+
+# Set POST data
+# Request HTTP type by default is GET. You can send POST request with setting post params. Also you cat send empty POST request.
+post = { some_data: '' }
+
 # Get response
-response = TinyGrabber.get url, headers: headers, proxy: proxy
+response = TinyGrabber.get url, headers: headers, proxy: proxy, auth: auth, post: post
 
 # HTTP answer code
 p response.code
@@ -47,16 +55,22 @@ p response.body
 
 # Nokogiri object
 p response.ng
+
+# Response cookies
+p response.cookies
 ```
 
 ## Changelog
 
-* ### *v 0.0.6*
+* *v 0.0.7*
+    * Add POST request
+    * Add Basic Authentication
+* *v 0.0.6*
     * Add Net::HTTPOK modify file for Nokogiri response
-* ### *v 0.0.5*
+* *v 0.0.5*
     * Fix work with non ascii url
     * Add new `ng` response method for getting Nokogiri object
-* ### *v 0.0.4*
+* *v 0.0.4*
     * Fix work with socks4(5) proxy
 
 ## Development
