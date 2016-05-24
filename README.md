@@ -44,8 +44,11 @@ auth = { username: '', password: '' }
 # Request HTTP type by default is GET. You can send POST request with setting post params. Also you cat send empty POST request.
 post = { some_data: '' }
 
-# Get response
-response = TinyGrabber.get url, headers: headers, proxy: proxy, auth: auth, post: post
+# HTTP GET request
+response = TinyGrabber.get url, headers: headers, proxy: proxy, auth: auth
+
+# HTTP GET request
+response = TinyGrabber.post url, post, headers: headers, proxy: proxy, auth: auth
 
 # HTTP answer code
 p response.code
@@ -62,6 +65,8 @@ p response.cookies
 
 ## Changelog
 
+* *v 0.1.0*
+    * Add TinyGrabber.post method for HTTP POST request
 * *v 0.0.7*
     * Add POST request
     * Add Basic Authentication

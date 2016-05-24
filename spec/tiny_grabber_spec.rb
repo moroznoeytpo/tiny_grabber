@@ -12,13 +12,12 @@ describe TinyGrabber do
   end
 
   it 'HTTP POST' do
-    response = TinyGrabber.get 'http://ras.arbitr.ru/Ras/Search',
+    response = TinyGrabber.post 'http://ras.arbitr.ru/Ras/Search', {},
       headers: {
           'Accept' => 'application/json',
           'Host' => 'ras.arbitr.ru',
           'X-Requested-With' => 'XMLHttpRequest'
-      },
-      post: { }
+      }
     expect(response.code).to eq("200")
   end
 end
