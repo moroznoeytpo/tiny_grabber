@@ -5,6 +5,6 @@
 /coverage/
 /doc/
 /pkg/
-/spec/reports/
+/spec/tiny_grabber_spec.rb
 /tmp/
 /log/

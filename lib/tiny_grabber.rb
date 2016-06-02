@@ -1,147 +1,179 @@
-require "tiny_grabber/version"
+require 'tiny_grabber/version'
+require 'tiny_grabber/agent'
 
 require 'uri'
 require 'net/http'
 require 'socksify/http'
 require 'tiny_grabber/http'
+require 'redis'
 
 # Main class for TinyGrabber
+#
 class TinyGrabber
 
-  @uri
-  @params
-  @http
-  @request
-
-  ##
-  # Get Net::HTTP object for content from remote single page
-  # [url (string)] Link to resource
-  # [params (hash)] Request params
-  # * [proxy (hash)] Configuration of remote proxy server
-  #   * *ip* address of remote proxy server
-  #   * *port* of remote proxy server
-  #   * *proxy_type* of remote proxy server
-  #     * *http* for http(s) proxy servers (by default)
-  #     * *socks* for socks4/5 proxy servers
-  # * [headers (hash)] Headers
-  # * [auth (hash)] Basic Authentication
-  #   * *username* Authenticate username
-  #   * *password* Authenticate password
+  # Initialize a new TinyGrabber user agent.
   #
-  # = Example
-  #   TinyGrabber.get url, headers: { 'Content-Type' => 'application/json' }, proxy: { ip: 'xx.xx.xx.xx', port: xx, proxy_type: :socks }
-  #
-  # @param url Link to resource
-  # @param params Request params
-  #
-  def self.get url, params = {}
-    @uri = set_url url
-    @params = convert_params_to_sym params
-    @http = set_http_connect
-    @request = Net::HTTP::Get.new(@uri.request_uri)
-    set_basic_auth
-    set_headers
-    get_request
+  def initialize
+    @agent = TinyGrabber::Agent.new
   end
 
 
-  ##
-  # Get Net::HTTP object for content from remote single page
-  # [url (string)] Link to resource
-  # [data (hash)] Post data
-  # [params (hash)] Request params
-  # * [proxy (hash)] Configuration of remote proxy server
-  #   * *ip* address of remote proxy server
-  #   * *port* of remote proxy server
-  #   * *proxy_type* of remote proxy server
-  #     * *http* for http(s) proxy servers (by default)
-  #     * *socks* for socks4/5 proxy servers
-  # * [headers (hash)] Headers
-  # * [auth (hash)] Basic Authentication
-  #   * *username* Authenticate username
-  #   * *password* Authenticate password
+  # Singleton > Initialize a new TinyGrabber user agent.
   #
-  # = Example
-  #   TinyGrabber.post url, data, headers: { 'Content-Type' => 'application/json' }, proxy: { ip: 'xx.xx.xx.xx', port: xx, proxy_type: :socks }
-  #
-  # @param url Link to resource
-  # @param params Request params
-  #
-  def self.post url, data, params = {}
-    @uri = set_url url
-    data = convert_params_to_sym data
-    @params = convert_params_to_sym params
-    @http = set_http_connect
-    @request = Net::HTTP::Post.new(@uri.request_uri)
-    @request.set_form_data(data)
-    set_basic_auth
-    set_headers
-    get_request
-  end
+  def self.initialize config = {}
+    @agent = TinyGrabber::Agent.new
 
-  private
-
-  # Convert all params key to symbols
-  #
-  # @param params Request params
-  #
-  def self.convert_params_to_sym params
-    params.is_a?(Hash) ? params.inject({}) { |h, (k, v)| h[k.to_sym] = convert_params_to_sym v; h } : params
-  end
-
-  # Convert URL to URI
-  #
-  # @param url Link to resource
-  #
-  def self.set_url url
-    URI(URI.escape(url))
+    @agent.debug = config[:debug] if config[:debug]
+    @agent.read_timeout = config[:read_timeout] if config[:read_timeout]
+    @agent.user_agent = config[:user_agent] if config[:user_agent]
+    @agent.proxy = config[:proxy] if config[:proxy]
+    @agent.basic_auth = config[:basic_auth] if config[:basic_auth]
+    @agent.headers = config[:headers] if config[:headers]
+    @agent.cookies = config[:cookies] if config[:cookies]
   end
 
 
-  # Use proxy for request
+  # HTTP::GET request
   #
-  def self.set_http_connect
-    if @params[:proxy]
-      if ['socks', :socks].include?(@params[:proxy][:proxy_type])
-        Net::HTTP.SOCKSProxy(@params[:proxy][:ip], @params[:proxy][:port])
-      else
-        Net::HTTP::Proxy(@params[:proxy][:ip], @params[:proxy][:port])
-      end
-    else
-      Net::HTTP
-    end
+  # @param url Resource link
+  # @param headers Request header
+  #
+  def get url, headers = {}
+    @agent.fetch url, :get, headers
+  end
+
+  # Singleton > HTTP::GET request
+  #
+  # @param url Resource link
+  # @param headers Request header
+  #
+  def self.get url, headers = {}, config = {}
+    initialize  config
+    @agent.fetch url, :get, headers
   end
 
 
-  # Set Basic Auth
+  # HTTP::POST request
   #
-  # @param request Request object
-  # @param params Request params
+  # @param url Resource link
+  # @param params Request post data
+  # @param headers Request header
   #
-  def self.set_basic_auth
-    if @params[:auth]
-      @request.basic_auth @params[:auth][:username], @params[:auth][:password]
-    end
+  def post url, params = {}, headers = {}, config = {}
+    @agent.fetch url, :post, headers, params
   end
 
 
-  # Headers
+  # Singleton >  HTTP::GET request
   #
-  # @param request Request object
-  # @param params Request params
+  # @param url Resource link
+  # @param headers Request header
   #
-  def self.set_headers
-    @params[:headers].each { |k, v| @request.add_field(String(k), v) } if @params[:headers]
+  def self.post url, params = {}, headers = {}, config = {}
+    initialize  config
+    @agent.fetch url, :post, headers, params
   end
 
 
-  # Make request to remote resource
+  # Set DEBUG flag
   #
-  # @param uri URI object
-  # @param http
+  # @param debug Flag to start debug
   #
-  def self.get_request
-    @http.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https') { |http| http.request(@request) }
+  def debug= debug
+    @agent.debug = debug
   end
+
+
+  # Read READ_TIMEOUT agent attribute
+  #
+  def read_timeout
+    @agent.read_timeout
+  end
+
+
+  # Set READ_TIMEOUT agent attribute
+  #
+  # @param read_timeout Waiting time to reading
+  #
+  def read_timeout= read_timeout
+    @agent.read_timeout = read_timeout
+  end
+
+
+  # Read USER_AGENT agent attribute
+  #
+  def user_agent
+    @agent.user_agent
+  end
+
+
+  # Set USER_AGENT agent attribute
+  #
+  # @param user_agent Web browser name
+  #
+  def user_agent= user_agent
+    @agent.user_agent = user_agent
+  end
+
+
+  # Read PROXY agent attribute
+  #
+  def proxy
+    @agent.proxy
+  end
+
+
+  # Set PROXY agent attribute
+  #
+  # @param proxy Proxy configuration
+  #
+  def proxy= proxy
+    @agent.proxy = proxy
+  end
+
+
+  # Set BASIC_AUTH agent attribute
+  #
+  # @param username Authentification username
+  # @param password Authentification password
+  #
+  def basic_auth username, password
+    @agent.basic_auth = { username: username, password: password }
+  end
+
+
+  # Read HEADERS agent attribute
+  #
+  def headers
+    @agent.headers
+  end
+
+
+  # Set HEADERS agent attribute
+  #
+  # @param headers Request headers
+  #
+  def headers= headers
+    @agent.headers = headers
+  end
+
+
+  # Read COOKIES agent attribute
+  #
+  def cookies
+    @agent.cookies
+  end
+
+
+  # Set COOKIES agent attribute
+  #
+  # @param cookies Request cookies
+  #
+  def cookies= cookies
+    @agent.cookies = cookies
+  end
+
+
+
 
 end

@@ -27,44 +27,62 @@ Or install it yourself as:
 
 require 'tiny_grabber'
 
-# Link to remote site
-url = 'https://github.com/moroznoeytpo/tiny_grabber'
+read_timeout = 300
+user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36'
+proxy = { ip: 'xx.xx.xx.xx', port: 'xxxx' }
+headers1 = { 'Content-Type' => 'text/html; charset=utf-8' }
+headers2 = { 'Content-Type' => 'text/html; charset=utf-8', 'Connection' => 'keep-alive' }
+cookies = 'username=username&password=password'
+params = { key: 'value' }
 
-# Set headers
-headers = { 'Content-Type' => 'application/json' }
+# Initialize TinyGrabber object
+tg = TinyGrabber.new
+# Set debug flag for view log information
+tg.debug = true
+# Set max time to execute request
+tg.read_timeout = read_timeout
+# Set web browser name
+tg.user_agent = user_agent
+# Set proxy configuration
+tg.proxy = proxy
+# Set basic authentification
+tg.basic_auth('username', 'password')
+# Set HTTP headers
+tg.headers = headers1
+# Set HTTP cookies
+tg.cookies = cookies
 
-# Set http(s)/socks4(5) proxy
-# Proxy type by default is http. You can change it to socks, with setting params proxy_type equal socks
-proxy = { ip: 'xx.xx.xx.xx', port: xx, proxy_type: :socks }
+# Make response with GET method
+response = tg.get 'https://whoer.net/ru', headers
+# Make response with POST method
+response = tg.get 'https://whoer.net/ru', params, headers
 
-# Set Basic Authentication
-auth = { username: '', password: '' }
+# Make singleton response with GET method
+response = TinyGrabber.get 'https://whoer.net/ru', headers, { debug = true, read_timeout = read_timeout ...}
+# Make singleton response with POST method
+response = TinyGrabber.post 'https://whoer.net/ru', params, headers, { debug = true, read_timeout = read_timeout ...}
 
-# Set POST data
-# Request HTTP type by default is GET. You can send POST request with setting post params. Also you cat send empty POST request.
-post = { some_data: '' }
+# Get Nokogiri object from response HTML
+ng = response.ng
+# Get HTTP response code
+response.code
+# Get response cookies
+response.cookies
+# Get response headers
+response.headers
 
-# HTTP GET request
-response = TinyGrabber.get url, headers: headers, proxy: proxy, auth: auth
-
-# HTTP GET request
-response = TinyGrabber.post url, post, headers: headers, proxy: proxy, auth: auth
-
-# HTTP answer code
-p response.code
-
-# HTTP content
-p response.body
-
-# Nokogiri object
-p response.ng
-
-# Response cookies
-p response.cookies
 ```
 
 ## Changelog
 
+* *v 0.2.0*
+    * Now there is an opportunity to create object TinyGrabber
+    * Change order of parameters for singleton request
+    * Add response cookies and headers
+    * Add debug flag for detilazition log and save result HTML to /log/*.html file
+
+* *v 0.1.1*
+    * Save cookie in Redis
 * *v 0.1.0*
     * Add TinyGrabber.post method for HTTP POST request
 * *v 0.0.7*
