@@ -47,9 +47,9 @@ class TinyGrabber
   # @param url Resource link
   # @param headers Request header
   #
-  def self.get url, headers = {}, config = {}
+  def self.get url, config = {}
     initialize  config
-    @agent.fetch url, :get, headers
+    @agent.fetch url, :get
   end
 
 
@@ -59,7 +59,7 @@ class TinyGrabber
   # @param params Request post data
   # @param headers Request header
   #
-  def post url, params = {}, headers = {}, config = {}
+  def post url, params = {}, headers = {}
     @agent.fetch url, :post, headers, params
   end
 
@@ -69,9 +69,9 @@ class TinyGrabber
   # @param url Resource link
   # @param headers Request header
   #
-  def self.post url, params = {}, headers = {}, config = {}
+  def self.post url, params = {}, config = {}
     initialize  config
-    @agent.fetch url, :post, headers, params
+    @agent.fetch url, :post, {}, params
   end
 
 
@@ -173,7 +173,9 @@ class TinyGrabber
     @agent.cookies = cookies
   end
 
-
-
-
+  # Call RESET agent method
+  #
+  def reset
+    @agent.reset
+  end
 end

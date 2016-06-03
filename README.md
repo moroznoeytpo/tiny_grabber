@@ -28,7 +28,7 @@ Or install it yourself as:
 require 'tiny_grabber'
 
 read_timeout = 300
-user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36'
+user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'
 proxy = { ip: 'xx.xx.xx.xx', port: 'xxxx' }
 headers1 = { 'Content-Type' => 'text/html; charset=utf-8' }
 headers2 = { 'Content-Type' => 'text/html; charset=utf-8', 'Connection' => 'keep-alive' }
@@ -54,13 +54,16 @@ tg.cookies = cookies
 
 # Make response with GET method
 response = tg.get 'https://whoer.net/ru', headers
+# Reset headers and cookies
+tg.reset
 # Make response with POST method
-response = tg.get 'https://whoer.net/ru', params, headers
+response = tg.post 'https://whoer.net/ru', params, headers
+
 
 # Make singleton response with GET method
-response = TinyGrabber.get 'https://whoer.net/ru', headers, { debug = true, read_timeout = read_timeout ...}
+response = TinyGrabber.get 'https://whoer.net/ru', { debug = true, read_timeout = read_timeout ... }
 # Make singleton response with POST method
-response = TinyGrabber.post 'https://whoer.net/ru', params, headers, { debug = true, read_timeout = read_timeout ...}
+response = TinyGrabber.post 'https://whoer.net/ru', params, { debug = true, read_timeout = read_timeout ... }
 
 # Get Nokogiri object from response HTML
 ng = response.ng
@@ -70,10 +73,17 @@ response.code
 response.cookies
 # Get response headers
 response.headers
-
+# Get response HTML
+response.body
 ```
 
 ## Changelog
+
+* *v 0.2.1*
+    * Setting random user_agent from list if it not seted
+    * Remove headers attribute from singleton methods
+    * Remove header transfer-encoding for chain requests
+    * Add reset method for delete headers and cookies
 
 * *v 0.2.0*
     * Now there is an opportunity to create object TinyGrabber

@@ -18,13 +18,37 @@ class TinyGrabber::Agent
   # Headers
   attr_accessor :cookies
 
+  #  Agent aliases given from http://www.useragentstring.com/pages/Chrome/
+  AGENT_ALIASES = [
+    # Chrome
+    'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36',
+    # Firefox
+    'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:40.0) Gecko/20100101 Firefox/40.1',
+    'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10; rv:33.0) Gecko/20100101 Firefox/33.0',
+    'Mozilla/5.0 (X11; Linux i586; rv:31.0) Gecko/20100101 Firefox/31.0',
+    # Internet Explorer
+    'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko',
+    'Mozilla/5.0 (compatible; MSIE 10.6; Windows NT 6.1; Trident/5.0; InfoPath.2; SLCC1; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; .NET CLR 2.0.50727) 3gpp-gba UNTRUSTED/1.0',
+    'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 7.0; InfoPath.3; .NET CLR 3.1.40767; Trident/6.0; en-IN)',
+    'Mozilla/5.0 (compatible; MSIE 10.0; Macintosh; Intel Mac OS X 10_7_3; Trident/6.0)',
+    # Opera
+    'Opera/9.80 (X11; Linux i686; Ubuntu/14.10) Presto/2.12.388 Version/12.16',
+    'Opera/9.80 (Windows NT 6.0) Presto/2.12.388 Version/12.14',
+    'Mozilla/5.0 (Windows NT 6.0; rv:2.0) Gecko/20100101 Firefox/4.0 Opera 12.14',
+    'Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; fr) Presto/2.9.168 Version/11.52',
+  ]
+
   # Initialization object
   #
   def initialize
     @debug = false
 
     # Initialize variables agent attributes
-    @user_agent = nil
+    @user_agent = AGENT_ALIASES[rand(AGENT_ALIASES.count) - 1]
     @proxy = []
     @basic_auth = {}
     @headers = {}
@@ -126,7 +150,7 @@ class TinyGrabber::Agent
     if @debug
       p "#{debug_initial_word} =============================="
       p "#{debug_initial_word} #{method.upcase} #{url}"
-      p "#{debug_initial_word} #{params}"
+      p "#{debug_initial_word} -> [params] = #{params}"
       p "#{debug_initial_word} ------------------------------"
     end
     set_uri url
@@ -160,7 +184,7 @@ class TinyGrabber::Agent
     if @debug
       debug_filename = "log/#{method.upcase}_#{@uri.to_s.gsub(/[\/:]/, '_').gsub(/_+/, '_')}"
       File.open(debug_filename, 'wb') { |f| f << @response.body } if @debug
-      p "#{debug_initial_word} HTML > #{debug_filename}"
+      p "#{debug_initial_word} <- [html_file] = #{debug_filename}"
     end
     @response
   end
@@ -173,7 +197,7 @@ class TinyGrabber::Agent
   def set_uri url
     # It's magic work with escaped url
     @uri = URI(URI.escape(URI.unescape(url)))
-    p "#{debug_initial_word} URI = #{@uri}" if @debug
+    p "#{debug_initial_word} -> [uri] = #{@uri}" if @debug
   end
 
 
@@ -181,7 +205,7 @@ class TinyGrabber::Agent
   #
   def set_user_agent
     @headers['User-Agent'] = @user_agent
-    p "#{debug_initial_word} user_agent = #{@user_agent}" if @debug
+    p "#{debug_initial_word} -> [user_agent] = #{@user_agent}" if @debug
   end
 
 
@@ -189,7 +213,7 @@ class TinyGrabber::Agent
   #
   def set_basic_auth
     @request.basic_auth @basic_auth[:username], @basic_auth[:password]
-    p "#{debug_initial_word} basic_auth = #{@basic_auth}" if @debug
+    p "#{debug_initial_word} -> [basic_auth] = #{@basic_auth}" if @debug
   end
 
 
@@ -197,7 +221,7 @@ class TinyGrabber::Agent
   #
   def set_headers
     @headers.each { |k, v| @request.add_field(String(k), v) }
-    p "#{debug_initial_word} headers = #{@headers}" if @debug
+    p "#{debug_initial_word} -> [headers] = #{@headers}" if @debug
   end
 
 
@@ -205,7 +229,7 @@ class TinyGrabber::Agent
   #
   def set_cookies
     @request['Cookie'] = @cookies
-    p "#{debug_initial_word} cookies = #{@cookies}" if @debug
+    p "#{debug_initial_word} -> [cookies] = #{@cookies}" if @debug
   end
 
 
@@ -215,7 +239,7 @@ class TinyGrabber::Agent
   def send_request
     @http.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
       http.read_timeout = @read_timeout
-      p "#{debug_initial_word} read_timeout = #{@read_timeout}" if @debug
+      p "#{debug_initial_word} -> [read_timeout] = #{@read_timeout}" if @debug
       http.request(@request)
     end
   end
@@ -225,7 +249,9 @@ class TinyGrabber::Agent
   #
   def save_headers
     @headers = @response.headers
-    p "#{debug_initial_word} save_headers = #{@headers}" if @debug
+    # Delete header TRANSFER_ENCODING for chain of requests
+    @headers.delete('transfer-encoding')
+    p "#{debug_initial_word} <- [headers] = #{@headers}" if @debug
   end
 
 
@@ -233,7 +259,15 @@ class TinyGrabber::Agent
   #
   def save_cookies
     @cookies = @response.cookies
-    p "#{debug_initial_word} save_cookies = #{@cookies}" if @debug
+    p "#{debug_initial_word} <- [cookies] = #{@cookies}" if @debug
+  end
+
+
+  # Clears headers and cookies
+  #
+  def reset
+    @headers = {}
+    @cookies = nil
   end
 
 
