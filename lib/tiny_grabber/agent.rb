@@ -5,6 +5,10 @@
 class TinyGrabber::Agent
   # Debug flag for detilazition log and save result HTML to /log/*.html file
   attr_accessor :debug
+  # Debug destination type
+  attr_accessor :debug_destination
+  # Debug flag for save html in file
+  attr_accessor :debug_save_html
   # Max time to execute request
   attr_accessor :read_timeout
   # Web browser name
@@ -46,6 +50,8 @@ class TinyGrabber::Agent
   #
   def initialize
     @debug = false
+    @debug_destination = :file
+    @debug_save_html = false
 
     # Initialize variables agent attributes
     @user_agent = AGENT_ALIASES[rand(AGENT_ALIASES.count) - 1]
@@ -148,10 +154,10 @@ class TinyGrabber::Agent
   #
   def fetch url, method = :get, headers = {}, params = {}
     if @debug
-      p "#{debug_initial_word} =============================="
-      p "#{debug_initial_word} #{method.upcase} #{url}"
-      p "#{debug_initial_word} -> [params] = #{params}"
-      p "#{debug_initial_word} ------------------------------"
+      Debug::save @debug_destination, '=============================='
+      Debug::save @debug_destination, "#{method.upcase} #{url}"
+      Debug::save @debug_destination, "-> [params] = #{params}"
+      Debug::save @debug_destination, '------------------------------'
     end
     set_uri url
     case method
@@ -170,22 +176,23 @@ class TinyGrabber::Agent
     case @response
       # HTTP response code 1xx
       when Net::HTTPInformation
+        Debug::save @debug_destination, "<- [response] = Net::HTTPInformation" if @debug
       # HTTP response code 2xx
       when Net::HTTPSuccess
         save_headers if @response.header
         save_cookies if @response.cookies
+        Debug::save @debug_destination, "<- [response] = #{@response.code} Net::HTTPSuccess" if @debug
       # HTTP response code 3xx
       when Net::HTTPRedirection
+        Debug::save @debug_destination, "<- [response] = #{@response.code} Net::HTTPRedirection" if @debug
       # HTTP response code 4xx
       when Net::HTTPClientError
+        Debug::save @debug_destination, "<- [response] = #{@response.code} Net::HTTPClientError" if @debug
       # HTTP response code 5xx
       when Net::HTTPServerError
+        Debug::save @debug_destination, "<- [response] = #{@response.code} Net::HTTPServerError" if @debug
     end
-    if @debug
-      debug_filename = "log/#{method.upcase}_#{@uri.to_s.gsub(/[\/:]/, '_').gsub(/_+/, '_')}"
-      File.open(debug_filename, 'wb') { |f| f << @response.body } if @debug
-      p "#{debug_initial_word} <- [html_file] = #{debug_filename}"
-    end
+    Debug::save_to_file @response.body  if @debug_save_html
     @response
   end
 
@@ -197,7 +204,7 @@ class TinyGrabber::Agent
   def set_uri url
     # It's magic work with escaped url
     @uri = URI(URI.escape(URI.unescape(url)))
-    p "#{debug_initial_word} -> [uri] = #{@uri}" if @debug
+    Debug::save @debug_destination, "-> [uri] = #{@uri}" if @debug
   end
 
 
@@ -205,7 +212,7 @@ class TinyGrabber::Agent
   #
   def set_user_agent
     @headers['User-Agent'] = @user_agent
-    p "#{debug_initial_word} -> [user_agent] = #{@user_agent}" if @debug
+    Debug::save @debug_destination, "-> [user_agent] = #{@user_agent}" if @debug
   end
 
 
@@ -213,7 +220,7 @@ class TinyGrabber::Agent
   #
   def set_basic_auth
     @request.basic_auth @basic_auth[:username], @basic_auth[:password]
-    p "#{debug_initial_word} -> [basic_auth] = #{@basic_auth}" if @debug
+    Debug::save @debug_destination, "-> [basic_auth] = #{@basic_auth}" if @debug
   end
 
 
@@ -221,7 +228,7 @@ class TinyGrabber::Agent
   #
   def set_headers
     @headers.each { |k, v| @request.add_field(String(k), v) }
-    p "#{debug_initial_word} -> [headers] = #{@headers}" if @debug
+    Debug::save @debug_destination, "-> [headers] = #{@headers}" if @debug
   end
 
 
@@ -229,7 +236,7 @@ class TinyGrabber::Agent
   #
   def set_cookies
     @request['Cookie'] = @cookies
-    p "#{debug_initial_word} -> [cookies] = #{@cookies}" if @debug
+    Debug::save @debug_destination, "-> [cookies] = #{@cookies}" if @debug
   end
 
 
@@ -239,7 +246,7 @@ class TinyGrabber::Agent
   def send_request
     @http.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
       http.read_timeout = @read_timeout
-      p "#{debug_initial_word} -> [read_timeout] = #{@read_timeout}" if @debug
+      Debug::save @debug_destination, "-> [read_timeout] = #{@read_timeout}" if @debug
       http.request(@request)
     end
   end
@@ -251,7 +258,7 @@ class TinyGrabber::Agent
     @headers = @response.headers
     # Delete header TRANSFER_ENCODING for chain of requests
     @headers.delete('transfer-encoding')
-    p "#{debug_initial_word} <- [headers] = #{@headers}" if @debug
+    Debug::save @debug_destination, "<- [headers] = #{@headers}" if @debug
   end
 
 
@@ -259,7 +266,7 @@ class TinyGrabber::Agent
   #
   def save_cookies
     @cookies = @response.cookies
-    p "#{debug_initial_word} <- [cookies] = #{@cookies}" if @debug
+    Debug::save @debug_destination, "<- [cookies] = #{@cookies}" if @debug
   end
 
 
@@ -268,12 +275,5 @@ class TinyGrabber::Agent
   def reset
     @headers = {}
     @cookies = nil
-  end
-
-
-  # Tiny grabber initial word for debug
-  #
-  def debug_initial_word
-    "TG | #{Time.now.strftime('%Y%m%d-%H%M%S')} |"
   end
 end

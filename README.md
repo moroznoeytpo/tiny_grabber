@@ -39,6 +39,11 @@ params = { key: 'value' }
 tg = TinyGrabber.new
 # Set debug flag for view log information
 tg.debug = true
+# Or set debug configuration
+# active - flag to save log information
+# destination - save log to file or print: [:file, :print]
+# save_html - flag to save response html to file
+tg.debug = { active: true, destination: :file, save_html: true }
 # Set max time to execute request
 tg.read_timeout = read_timeout
 # Set web browser name
@@ -78,6 +83,9 @@ response.body
 ```
 
 ## Changelog
+
+* *v 0.2.2*
+    * Added debug configurations.
 
 * *v 0.2.1*
     * Setting random user_agent from list if it not seted

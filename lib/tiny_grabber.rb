@@ -1,5 +1,6 @@
 require 'tiny_grabber/version'
 require 'tiny_grabber/agent'
+require 'tiny_grabber/debug'
 
 require 'uri'
 require 'net/http'
@@ -80,7 +81,15 @@ class TinyGrabber
   # @param debug Flag to start debug
   #
   def debug= debug
-    @agent.debug = debug
+    if debug.is_a?(TrueClass) || debug.is_a?(FalseClass)
+      @agent.debug = debug
+      @agent.debug_destination = :print
+      @agent.debug_save_html = false
+    elsif debug.is_a? Hash
+      @agent.debug = debug[:active]
+      @agent.debug_destination = debug[:destination]
+      @agent.debug_save_html = debug[:save_html]
+    end
   end
 
 
