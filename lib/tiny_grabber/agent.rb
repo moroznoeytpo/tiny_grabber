@@ -138,6 +138,7 @@ class TinyGrabber::Agent
   # @param cookies Request cookies
   #
   def cookies= cookies
+    cookies = cookies.to_a.map { |x| "#{x[0]}=#{x[1]}" }.join('&') if cookies.is_a?(Hash)
     fail 'attribute cookies must be String' unless cookies.is_a?(String)
     @cookies = cookies
   end

@@ -6,7 +6,6 @@ require 'uri'
 require 'net/http'
 require 'socksify/http'
 require 'tiny_grabber/http'
-require 'redis'
 
 # Main class for TinyGrabber
 #
