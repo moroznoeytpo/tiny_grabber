@@ -114,6 +114,8 @@ response.body
 
 ## Changelog
 
+* *v 0.2.4*
+    * Add debug file
 * *v 0.2.3*
     * The feature to set cookies in the form of a Hash is added
 * *v 0.2.2*
