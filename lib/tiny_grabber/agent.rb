@@ -3,12 +3,8 @@
 # Setting connect attributes
 #
 class TinyGrabber::Agent
-  # Debug flag for detilazition log and save result HTML to /log/*.html file
+  # Debug configuration
   attr_accessor :debug
-  # Debug destination type
-  attr_accessor :debug_destination
-  # Debug flag for save html in file
-  attr_accessor :debug_save_html
   # Max time to execute request
   attr_accessor :read_timeout
   # Web browser name
@@ -49,9 +45,7 @@ class TinyGrabber::Agent
   # Initialization object
   #
   def initialize
-    @debug = false
-    @debug_destination = :file
-    @debug_save_html = false
+    @debug = Debug.new
 
     # Initialize variables agent attributes
     @user_agent = AGENT_ALIASES[rand(AGENT_ALIASES.count) - 1]
@@ -66,6 +60,22 @@ class TinyGrabber::Agent
     @http = Net::HTTP
     # Initialize variable for Net::HTTP response object
     @response = nil
+  end
+
+
+  # Set debug configuration
+  #
+  # @param debug
+  #
+  def debug= debug
+    debug = var_to_sym(debug, true)
+    if debug.is_a?(Hash)
+      @debug.active = debug[:active]
+      @debug.destination = debug[:destination]
+      @debug.save_html = debug[:save_html]
+    elsif debug.is_a?(TrueClass)
+      @debug.active = true
+    end
   end
 
 
@@ -96,16 +106,18 @@ class TinyGrabber::Agent
   #
   def proxy= proxy
     if proxy.is_a?(String)
-      ip, port = proxy.split(':')
+      ip, port, type = proxy.split(':')
       fail 'attribute proxy must be in format ip:port' unless ip and port
-      proxy = { ip: ip, port: port }
+      type ||= :http
+      proxy = { ip: ip, port: port, type: type }
     end
+    proxy = var_to_sym(proxy)
     fail 'attribute proxy must be Hash' unless proxy.is_a?(Hash)
     fail 'attribute proxy must contain :ip and :port keys' unless proxy[:ip] and proxy[:port]
 
     @proxy = proxy
-    if ['socks', :socks].include?(proxy[:type])
-      @http = Net::HTTP.SOCKSProxy(proxy[:ip], proxy[:port])
+    if [:socks, 'socks'].include? proxy[:type]
+      @http = Net::HTTP.SOCKSProxy(proxy[:ip].to_s, proxy[:port].to_s)
     else
       @http = Net::HTTP::Proxy(proxy[:ip], proxy[:port])
     end
@@ -117,6 +129,7 @@ class TinyGrabber::Agent
   # @param basic_auth Authentification configuration
   #
   def basic_auth= basic_auth
+    basic_auth = var_to_sym(basic_auth)
     fail 'attribute basic_auth must be Hash' unless basic_auth.is_a?(Hash)
     fail 'attribute basic_auth must contain :username and :password keys' unless basic_auth[:username] and basic_auth[:password]
     @basic_auth = basic_auth
@@ -138,6 +151,7 @@ class TinyGrabber::Agent
   # @param cookies Request cookies
   #
   def cookies= cookies
+    cookies = var_to_sym(cookies)
     cookies = cookies.to_a.map { |x| "#{x[0]}=#{x[1]}" }.join('&') if cookies.is_a?(Hash)
     fail 'attribute cookies must be String' unless cookies.is_a?(String)
     @cookies = cookies
@@ -154,11 +168,12 @@ class TinyGrabber::Agent
   # @param params Request additional params
   #
   def fetch url, method = :get, headers = {}, params = {}
-    if @debug
-      Debug::save @debug_destination, '=============================='
-      Debug::save @debug_destination, "#{method.upcase} #{url}"
-      Debug::save @debug_destination, "-> [params] = #{params}"
-      Debug::save @debug_destination, '------------------------------'
+    if @debug.active
+      @debug.save '=============================='
+      @debug.save "#{method.upcase} #{url}"
+      @debug.save "-> [proxy] = #{@proxy}" if @proxy
+      @debug.save "-> [params] = #{params}"
+      @debug.save '------------------------------'
     end
     set_uri url
     case method
@@ -177,23 +192,23 @@ class TinyGrabber::Agent
     case @response
       # HTTP response code 1xx
       when Net::HTTPInformation
-        Debug::save @debug_destination, "<- [response] = Net::HTTPInformation" if @debug
+        @debug.save "<- [response] = Net::HTTPInformation" if @debug.active
       # HTTP response code 2xx
       when Net::HTTPSuccess
         save_headers if @response.header
         save_cookies if @response.cookies
-        Debug::save @debug_destination, "<- [response] = #{@response.code} Net::HTTPSuccess" if @debug
+        @debug.save "<- [response] = #{@response.code} Net::HTTPSuccess" if @debug.active
       # HTTP response code 3xx
       when Net::HTTPRedirection
-        Debug::save @debug_destination, "<- [response] = #{@response.code} Net::HTTPRedirection" if @debug
+        @debug.save "<- [response] = #{@response.code} Net::HTTPRedirection" if @debug.active
       # HTTP response code 4xx
       when Net::HTTPClientError
-        Debug::save @debug_destination, "<- [response] = #{@response.code} Net::HTTPClientError" if @debug
+        @debug.save "<- [response] = #{@response.code} Net::HTTPClientError" if @debug.active
       # HTTP response code 5xx
       when Net::HTTPServerError
-        Debug::save @debug_destination, "<- [response] = #{@response.code} Net::HTTPServerError" if @debug
+        @debug.save "<- [response] = #{@response.code} Net::HTTPServerError" if @debug.active
     end
-    Debug::save_to_file @response.body  if @debug_save_html
+    @debug.save_to_file @response.body  if @debug.save_html
     @response
   end
 
@@ -205,7 +220,7 @@ class TinyGrabber::Agent
   def set_uri url
     # It's magic work with escaped url
     @uri = URI(URI.escape(URI.unescape(url)))
-    Debug::save @debug_destination, "-> [uri] = #{@uri}" if @debug
+    @debug.save "-> [uri] = #{@uri}" if @debug.active
   end
 
 
@@ -213,7 +228,7 @@ class TinyGrabber::Agent
   #
   def set_user_agent
     @headers['User-Agent'] = @user_agent
-    Debug::save @debug_destination, "-> [user_agent] = #{@user_agent}" if @debug
+    @debug.save "-> [user_agent] = #{@user_agent}" if @debug.active
   end
 
 
@@ -221,7 +236,7 @@ class TinyGrabber::Agent
   #
   def set_basic_auth
     @request.basic_auth @basic_auth[:username], @basic_auth[:password]
-    Debug::save @debug_destination, "-> [basic_auth] = #{@basic_auth}" if @debug
+    @debug.save "-> [basic_auth] = #{@basic_auth}" if @debug.active
   end
 
 
@@ -229,7 +244,7 @@ class TinyGrabber::Agent
   #
   def set_headers
     @headers.each { |k, v| @request.add_field(String(k), v) }
-    Debug::save @debug_destination, "-> [headers] = #{@headers}" if @debug
+    @debug.save "-> [headers] = #{@headers}" if @debug.active
   end
 
 
@@ -237,7 +252,7 @@ class TinyGrabber::Agent
   #
   def set_cookies
     @request['Cookie'] = @cookies
-    Debug::save @debug_destination, "-> [cookies] = #{@cookies}" if @debug
+    @debug.save "-> [cookies] = #{@cookies}" if @debug.active
   end
 
 
@@ -247,7 +262,7 @@ class TinyGrabber::Agent
   def send_request
     @http.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
       http.read_timeout = @read_timeout
-      Debug::save @debug_destination, "-> [read_timeout] = #{@read_timeout}" if @debug
+      @debug.save "-> [read_timeout] = #{@read_timeout}" if @debug.active
       http.request(@request)
     end
   end
@@ -259,7 +274,7 @@ class TinyGrabber::Agent
     @headers = @response.headers
     # Delete header TRANSFER_ENCODING for chain of requests
     @headers.delete('transfer-encoding')
-    Debug::save @debug_destination, "<- [headers] = #{@headers}" if @debug
+    @debug.save "<- [headers] = #{@headers}" if @debug.active
   end
 
 
@@ -267,7 +282,7 @@ class TinyGrabber::Agent
   #
   def save_cookies
     @cookies = @response.cookies
-    Debug::save @debug_destination, "<- [cookies] = #{@cookies}" if @debug
+    @debug.save "<- [cookies] = #{@cookies}" if @debug.active
   end
 
 
@@ -276,5 +291,28 @@ class TinyGrabber::Agent
   def reset
     @headers = {}
     @cookies = nil
+  end
+
+  # Convert variables and contains to symbol
+  #
+  # @param var Variable need to convert
+  #
+  def var_to_sym var, str_to_sym = false
+    if var.is_a?(Hash)
+      result = {}
+      var.each do |k, v|
+        result[k.to_sym] = var_to_sym(v, str_to_sym)
+      end
+    elsif var.is_a?(Array)
+      result = []
+      var.each do |v|
+        result << var_to_sym(v, str_to_sym)
+      end
+    elsif var.is_a?(String)
+      result = str_to_sym ? var.to_sym : var
+    else
+      result = var
+    end
+    result
   end
 end

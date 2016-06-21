@@ -32,30 +32,38 @@ require 'tiny_grabber'
 
 # Set request timelive
 read_timeout = 300
+
 # You can set own UserAgent, but by default each request get random UserAgent from list of most popular
 user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'
+
 # Set proxy for concealment your real IP
-proxy = { ip: 'xx.xx.xx.xx', port: 'xxxx' }
+# ip(required argument) - String format [0-9]+\.[0-9]+\.[0-9]+\.
+# port(required argument) - Integer
+# type - Connect type `http` or `socks`
+proxy = { ip: 'xx.xx.xx.xx', port: 'xxxx', type: '...' }
+
 # Set Net::HTTP headers
 headers = { 'Content-Type' => 'text/html; charset=utf-8' }
-# You can set own cookies like String
+
+# You can set own cookies like String or Hash
 cookies = 'username=username&password=password'
-# or Hash
 cookies = { username: 'username', password: 'password' }
+
 # For POST request you can set DATAS
 params = { key: 'value' }
 
 # Initialize TinyGrabber object
 tg = TinyGrabber.new
 
-# Set debug flag for view log information
-tg.debug = true
 
-# Or set debug configuration
-# active - flag to save log information
-# destination - save log to file or print: [:file, :print]
-# save_html - flag to save response html to file
+# Set debug configuration
+# active - Flag to save log information
+# destination - Save log to file or print: [:file, :print]
+# save_html - Flag to save response html to file
 tg.debug = { active: true, destination: :file, save_html: true }
+
+# Set debug flag for activate debug with default configuration { active: true, destination: :print, save_html: false }
+tg.debug = true
 
 # Set max time to execute request
 tg.read_timeout = read_timeout
@@ -114,8 +122,11 @@ response.body
 
 ## Changelog
 
+* *v 0.2.5*
+    * Added auto convert params to symbol
+    Now you can set cookies with hash `cookies = { "username" => 'username', "password" => 'password' }`
 * *v 0.2.4*
-    * Add debug file
+    * Added debug file
 * *v 0.2.3*
     * The feature to set cookies in the form of a Hash is added
 * *v 0.2.2*
