@@ -260,8 +260,9 @@ class TinyGrabber::Agent
   # Use SSL connect for HTTPS link scheme
   #
   def send_request
-    @http.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
-      http.read_timeout = @read_timeout
+    # @http.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
+    @http.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https', read_timeout: @read_timeout) do |http|
+      # http.read_timeout = @read_timeout
       @debug.save "-> [read_timeout] = #{@read_timeout}" if @debug.active
       http.request(@request)
     end

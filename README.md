@@ -122,6 +122,8 @@ response.body
 
 ## Changelog
 
+* *v 0.2.6*
+    * Move read_timeout param to agent start method
 * *v 0.2.5*
     * Added auto convert params to symbol
     Now you can set cookies with hash `cookies = { "username" => 'username', "password" => 'password' }`
