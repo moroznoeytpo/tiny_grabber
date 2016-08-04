@@ -126,8 +126,10 @@ response.body
 
 ## Changelog
 
+* *v 0.2.8*
+    * Added processing Accept headers
 * *v 0.2.7*
-    * Add verify_mode configuration attribute. By default use OpenSSL::SSL::VERIFY_NONE
+    * Added verify_mode configuration attribute. By default use OpenSSL::SSL::VERIFY_NONE
 * *v 0.2.6*
     * Move read_timeout param to agent start method
 * *v 0.2.5*

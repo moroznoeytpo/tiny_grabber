@@ -253,7 +253,15 @@ class TinyGrabber::Agent
   # Set request HEADERS
   #
   def set_headers
-    @headers.each { |k, v| @request.add_field(String(k), v) }
+    @headers.each do |k, v|
+      k = String(k)
+      case k
+        when 'Accept'
+          @request[k] = v
+        else
+          @request.add_field(k, v)
+      end
+    end
     @debug.save "-> [headers] = #{@headers}" if @debug.active
   end
 
