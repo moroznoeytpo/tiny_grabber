@@ -83,6 +83,10 @@ tg.headers = headers
 # Set HTTP cookies
 tg.cookies = cookies
 
+# Set SSL verify_mode.
+# By default use OpenSSL::SSL::VERIFY_NONE
+tg.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
 
 # Make request
 
@@ -122,6 +126,8 @@ response.body
 
 ## Changelog
 
+* *v 0.2.7*
+    * Add verify_mode configuration attribute. By default use OpenSSL::SSL::VERIFY_NONE
 * *v 0.2.6*
     * Move read_timeout param to agent start method
 * *v 0.2.5*

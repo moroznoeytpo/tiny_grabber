@@ -178,4 +178,13 @@ class TinyGrabber
   def reset
     @agent.reset
   end
+
+
+  # Set verify_mode
+  #
+  # @param verify_mode SSL verify mode
+  #
+  def verify_mode= verify_mode
+    @agent.verify_mode = verify_mode
+  end
 end

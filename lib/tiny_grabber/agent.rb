@@ -60,6 +60,7 @@ class TinyGrabber::Agent
     @http = Net::HTTP
     # Initialize variable for Net::HTTP response object
     @response = nil
+    @verify_mode = OpenSSL::SSL::VERIFY_NONE
   end
 
 
@@ -155,6 +156,15 @@ class TinyGrabber::Agent
     cookies = cookies.to_a.map { |x| "#{x[0]}=#{x[1]}" }.join('&') if cookies.is_a?(Hash)
     fail 'attribute cookies must be String' unless cookies.is_a?(String)
     @cookies = cookies
+  end
+
+
+  # Set verify_mode
+  #
+  # @param verify_mode SSL verify_mode
+  #
+  def verify_mode= verify_mode
+    @verify_mode = verify_mode
   end
 
 
@@ -260,9 +270,7 @@ class TinyGrabber::Agent
   # Use SSL connect for HTTPS link scheme
   #
   def send_request
-    # @http.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https') do |http|
-    @http.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https', read_timeout: @read_timeout) do |http|
-      # http.read_timeout = @read_timeout
+    @http.start(@uri.host, @uri.port, use_ssl: @uri.scheme == 'https', verify_mode: @verify_mode, read_timeout: @read_timeout) do |http|
       @debug.save "-> [read_timeout] = #{@read_timeout}" if @debug.active
       http.request(@request)
     end
