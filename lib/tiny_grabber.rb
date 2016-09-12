@@ -10,17 +10,15 @@ require 'tiny_grabber/http'
 # Main class for TinyGrabber
 #
 class TinyGrabber
-
   # Initialize a new TinyGrabber user agent.
   #
   def initialize
     @agent = TinyGrabber::Agent.new
   end
 
-
   # Singleton > Initialize a new TinyGrabber user agent.
   #
-  def self.initialize config = {}
+  def self.initialize(config = {})
     @agent = TinyGrabber::Agent.new
 
     @agent.debug = config[:debug] if config[:debug]
@@ -32,13 +30,12 @@ class TinyGrabber
     @agent.cookies = config[:cookies] if config[:cookies]
   end
 
-
   # HTTP::GET request
   #
   # @param url Resource link
   # @param headers Request header
   #
-  def get url, headers = {}
+  def get(url, headers = {})
     @agent.fetch url, :get, headers
   end
 
@@ -47,11 +44,10 @@ class TinyGrabber
   # @param url Resource link
   # @param headers Request header
   #
-  def self.get url, config = {}
-    initialize  config
+  def self.get(url, config = {})
+    initialize config
     @agent.fetch url, :get
   end
-
 
   # HTTP::POST request
   #
@@ -59,30 +55,27 @@ class TinyGrabber
   # @param params Request post data
   # @param headers Request header
   #
-  def post url, params = {}, headers = {}
+  def post(url, params = {}, headers = {})
     @agent.fetch url, :post, headers, params
   end
-
 
   # Singleton >  HTTP::GET request
   #
   # @param url Resource link
   # @param headers Request header
   #
-  def self.post url, params = {}, config = {}
-    initialize  config
+  def self.post(url, params = {}, config = {})
+    initialize config
     @agent.fetch url, :post, {}, params
   end
-
 
   # Set DEBUG flag
   #
   # @param debug Flag to start debug
   #
-  def debug= debug
+  def debug=(debug)
     @agent.debug = debug
   end
-
 
   # Read READ_TIMEOUT agent attribute
   #
@@ -90,15 +83,13 @@ class TinyGrabber
     @agent.read_timeout
   end
 
-
   # Set READ_TIMEOUT agent attribute
   #
   # @param read_timeout Waiting time to reading
   #
-  def read_timeout= read_timeout
+  def read_timeout=(read_timeout)
     @agent.read_timeout = read_timeout
   end
-
 
   # Read USER_AGENT agent attribute
   #
@@ -106,15 +97,13 @@ class TinyGrabber
     @agent.user_agent
   end
 
-
   # Set USER_AGENT agent attribute
   #
   # @param user_agent Web browser name
   #
-  def user_agent= user_agent
+  def user_agent=(user_agent)
     @agent.user_agent = user_agent
   end
-
 
   # Read PROXY agent attribute
   #
@@ -122,25 +111,22 @@ class TinyGrabber
     @agent.proxy
   end
 
-
   # Set PROXY agent attribute
   #
   # @param proxy Proxy configuration
   #
-  def proxy= proxy
+  def proxy=(proxy)
     @agent.proxy = proxy
   end
-
 
   # Set BASIC_AUTH agent attribute
   #
   # @param username Authentification username
   # @param password Authentification password
   #
-  def basic_auth username, password
+  def basic_auth(username, password)
     @agent.basic_auth = { username: username, password: password }
   end
-
 
   # Read HEADERS agent attribute
   #
@@ -148,15 +134,13 @@ class TinyGrabber
     @agent.headers
   end
 
-
   # Set HEADERS agent attribute
   #
   # @param headers Request headers
   #
-  def headers= headers
+  def headers=(headers)
     @agent.headers = headers
   end
-
 
   # Read COOKIES agent attribute
   #
@@ -164,12 +148,11 @@ class TinyGrabber
     @agent.cookies
   end
 
-
   # Set COOKIES agent attribute
   #
   # @param cookies Request cookies
   #
-  def cookies= cookies
+  def cookies=(cookies)
     @agent.cookies = cookies
   end
 
@@ -179,12 +162,19 @@ class TinyGrabber
     @agent.reset
   end
 
-
   # Set verify_mode
   #
   # @param verify_mode SSL verify mode
   #
-  def verify_mode= verify_mode
+  def verify_mode=(verify_mode)
     @agent.verify_mode = verify_mode
+  end
+
+  # Set follow_location
+  #
+  # @param follow_location Follow location flag
+  #
+  def follow_location=(follow_location)
+    @agent.follow_location = follow_location
   end
 end

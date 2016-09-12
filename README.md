@@ -126,6 +126,11 @@ response.body
 
 ## Changelog
 
+* *v 0.2.9*
+    * Added agent attribute for redirect follow location
+    * Used 302 http answer code and header location for redirecting
+    * Used meta refresh url
+    * Refactored code for rubocop
 * *v 0.2.8*
     * Added processing Accept headers
 * *v 0.2.7*

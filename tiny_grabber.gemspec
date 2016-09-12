@@ -6,11 +6,11 @@ require 'tiny_grabber/version'
 Gem::Specification.new do |spec|
   spec.name          = 'tiny_grabber'
   spec.version       = TinyGrabber::VERSION
-  spec.authors       = ["Aleksandr Chernyshev"]
+  spec.authors       = ['Aleksandr Chernyshev']
   spec.email         = ['moroznoeytpo@gmail.com']
 
-  spec.summary       = %q{Tiny grabber}
-  spec.description   = %q{Simple gem for grabbing remote web page.}
+  spec.summary       = 'Tiny grabber'
+  spec.description   = 'Simple gem for grabbing remote web page.'
   spec.homepage      = 'https://github.com/moroznoeytpo/tiny_grabber'
   spec.license       = 'MIT'
 
