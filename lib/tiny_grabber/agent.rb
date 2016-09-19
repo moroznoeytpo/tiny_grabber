@@ -241,6 +241,8 @@ class TinyGrabber
     # @param url Request link
     #
     def convert_to_uri(url)
+      # Remove anchor
+      url = url.gsub(/#.*\Z/, '')
       # It's magic work with escaped url
       @uri = URI(URI.escape(URI.unescape(url)))
       @debug.save "-> [uri] = #{@uri}" if @debug.active

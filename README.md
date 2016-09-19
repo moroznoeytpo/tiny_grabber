@@ -126,6 +126,10 @@ response.body
 
 ## Changelog
 
+* *v 0.3.1*
+    * Remove anchor from url
+* *v 0.3.0*
+    * ---
 * *v 0.2.9*
     * Added agent attribute for redirect follow location
     * Used 302 http answer code and header location for redirecting
