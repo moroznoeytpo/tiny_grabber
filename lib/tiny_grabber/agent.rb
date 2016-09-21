@@ -239,6 +239,7 @@ class TinyGrabber
       when Net::HTTPServerError
         @debug.save "<- [response] = #{@response.code} Net::HTTPServerError" if @debug.active
       end
+      @response.uri = @uri
       @debug.save_to_file @response.body if @debug.save_html
       @response
     end

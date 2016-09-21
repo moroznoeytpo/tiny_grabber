@@ -124,6 +124,7 @@ response.headers
 response.body
 
 # Get latest request URI
+response.uri
 tg.uri
 ```
 
