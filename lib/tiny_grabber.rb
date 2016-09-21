@@ -177,4 +177,10 @@ class TinyGrabber
   def follow_location=(follow_location)
     @agent.follow_location = follow_location
   end
+
+  # Read URI
+  #
+  def uri
+    @agent.uri
+  end
 end

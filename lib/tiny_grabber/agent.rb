@@ -22,6 +22,8 @@ class TinyGrabber
     attr_writer :verify_mode
     # Follow location
     attr_writer :follow_location
+    # Uri
+    attr_accessor :uri
 
     #  Agent aliases given from http://www.useragentstring.com/pages/Chrome/
     AGENT_ALIASES = [

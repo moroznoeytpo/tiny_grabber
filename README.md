@@ -126,6 +126,8 @@ response.body
 
 ## Changelog
 
+* *v 0.3.4*
+    * Return URI of last request was added
 * *v 0.3.3*
     * Format cookies was changed
 * *v 0.3.2*
