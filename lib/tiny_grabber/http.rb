@@ -14,9 +14,7 @@ module Net
     #
     def cookies
       cookies = get_fields('set-cookie')
-      if cookies
-        cookies.map { |cookie| cookie.gsub(/\A([^;]+).*\Z/, '\1') }.join('&')
-      end
+      cookies.map { |cookie| cookie.gsub(/\A([^;]+).*\Z/, '\1') }.join('&') if cookies
     end
 
     # Response Headers

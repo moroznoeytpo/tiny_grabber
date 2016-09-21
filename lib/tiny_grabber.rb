@@ -131,7 +131,7 @@ class TinyGrabber
   # Read HEADERS agent attribute
   #
   def headers
-    @agent.headers
+    @agent.headers.to_hash
   end
 
   # Set HEADERS agent attribute

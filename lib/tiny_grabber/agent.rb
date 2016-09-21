@@ -15,9 +15,9 @@ class TinyGrabber
     # Basic authentification configuration
     attr_writer :basic_auth
     # Headers
-    attr_writer :headers
+    attr_reader :headers
     # Headers
-    attr_writer :cookies
+    attr_accessor :cookies
     # Set verify mode
     attr_writer :verify_mode
     # Follow location
@@ -202,7 +202,7 @@ class TinyGrabber
       set_user_agent if @user_agent
       set_basic_auth unless @basic_auth.empty?
       @headers = headers unless headers.empty?
-      set_headers unless @headers.empty?
+      set_headers if @headers
       set_cookies if @cookies
       @response = send_request
       case @response
@@ -212,7 +212,7 @@ class TinyGrabber
       # HTTP response code 2xx
       when Net::HTTPSuccess
         save_headers if @response.header
-        save_cookies if @response.cookies
+        save_cookies if @response['Set-Cookie']
         @debug.save "<- [response] = #{@response.code} Net::HTTPSuccess" if @debug.active
         # Follow meta refresh
         if @follow_location
@@ -224,7 +224,12 @@ class TinyGrabber
         @debug.save "<- [response] = #{@response.code} Net::HTTPRedirection" if @debug.active
         @debug.save 'try curl user_agent: tg.user_agent=\'curl\''
         # Follow location
-        @response = fetch @response.header['Location'] if @follow_location
+        if @follow_location
+          @response = fetch @response.header['Location']
+        else
+          save_headers if @response.header
+          save_cookies if @response['Set-Cookie']
+        end
       # HTTP response code 4xx
       when Net::HTTPClientError
         @debug.save "<- [response] = #{@response.code} Net::HTTPClientError" if @debug.active
@@ -297,7 +302,7 @@ class TinyGrabber
     # Save response headers in agent attribute
     #
     def save_headers
-      @headers = @response.headers
+      @headers = @response.header
       # Delete header TRANSFER_ENCODING for chain of requests
       @headers.delete('transfer-encoding')
       @debug.save "<- [headers] = #{@headers}" if @debug.active
@@ -306,7 +311,7 @@ class TinyGrabber
     # Save response cookies in agent attribute
     #
     def save_cookies
-      @cookies = @response.cookies
+      @cookies = @response['Set-Cookie']
       @debug.save "<- [cookies] = #{@cookies}" if @debug.active
     end
 

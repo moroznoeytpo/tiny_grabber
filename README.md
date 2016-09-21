@@ -126,6 +126,8 @@ response.body
 
 ## Changelog
 
+* *v 0.3.2*
+    * Save cookies and headers in 302 unswer code was added
 * *v 0.3.1*
     * Remove anchor from url
 * *v 0.3.0*
