@@ -122,6 +122,9 @@ response.headers
 
 # Get response HTML
 response.body
+
+# Get latest request URI
+tg.uri
 ```
 
 ## Changelog
