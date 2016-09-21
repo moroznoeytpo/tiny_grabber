@@ -211,8 +211,8 @@ class TinyGrabber
         @debug.save '<- [response] = Net::HTTPInformation' if @debug.active
       # HTTP response code 2xx
       when Net::HTTPSuccess
-        save_headers if @response.header
-        save_cookies if @response['Set-Cookie']
+        save_headers
+        save_cookies
         @debug.save "<- [response] = #{@response.code} Net::HTTPSuccess" if @debug.active
         # Follow meta refresh
         if @follow_location
@@ -222,13 +222,13 @@ class TinyGrabber
       # HTTP response code 3xx
       when Net::HTTPRedirection
         @debug.save "<- [response] = #{@response.code} Net::HTTPRedirection" if @debug.active
-        @debug.save 'try curl user_agent: tg.user_agent=\'curl\''
+        @debug.save 'try curl user_agent: tg.user_agent=\'curl\'' if @debug.active
         # Follow location
         if @follow_location
           @response = fetch @response.header['Location']
         else
-          save_headers if @response.header
-          save_cookies if @response['Set-Cookie']
+          save_headers
+          save_cookies
         end
       # HTTP response code 4xx
       when Net::HTTPClientError
@@ -302,6 +302,7 @@ class TinyGrabber
     # Save response headers in agent attribute
     #
     def save_headers
+      return unless @response.header
       @headers = @response.header
       # Delete header TRANSFER_ENCODING for chain of requests
       @headers.delete('transfer-encoding')
@@ -311,7 +312,9 @@ class TinyGrabber
     # Save response cookies in agent attribute
     #
     def save_cookies
-      @cookies = @response['Set-Cookie']
+      return unless @response.cookies
+      # @cookies = @response['Set-Cookie']
+      @cookies = @response.cookies
       @debug.save "<- [cookies] = #{@cookies}" if @debug.active
     end
 
