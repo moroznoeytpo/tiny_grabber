@@ -314,10 +314,13 @@ class TinyGrabber
     # Save response cookies in agent attribute
     #
     def save_cookies
-      return unless @response.cookies
-      # @cookies = @response['Set-Cookie']
-      @cookies = @response.cookies
-      @debug.save "<- [cookies] = #{@cookies}" if @debug.active
+      if @response.respond_to?(:cookies)
+        return unless @response.cookies
+        @cookies = @response.cookies
+      else
+        return unless @response['Set-Cookie']
+        @cookies = @response['Set-Cookie']
+      end
     end
 
     # Clears headers and cookies
