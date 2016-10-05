@@ -1,4 +1,5 @@
 require 'nokogiri'
+require 'nokogumbo'
 
 # Net/HTTP module
 module Net
@@ -6,8 +7,8 @@ module Net
   class HTTPOK
     # Nokogiri object of response
     #
-    def ng
-      Nokogiri::HTML(body)
+    def ng(html_version = 5)
+      html_version == 5 ? Nokogiri::HTML5(body) : Nokogiri::HTML(body)
     end
 
     # Response Cookies

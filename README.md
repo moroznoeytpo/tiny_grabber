@@ -130,6 +130,8 @@ tg.uri
 
 ## Changelog
 
+* *v 0.3.6*
+    * Add nokogumbo gem for work with HTML5 content. Now ng method responce nokogumbo object.
 * *v 0.3.4*
     * Return URI of last request was added
 * *v 0.3.3*
