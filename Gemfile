@@ -7,3 +7,7 @@ gem 'rubocop', require: false
 gem 'byebug'
 gem 'timezone', '~> 1.0'
 gem 'nokogumbo', '~> 1.4', '>= 1.4.9'
+
+group :test do
+  gem 'json'
+end

@@ -130,6 +130,8 @@ tg.uri
 
 ## Changelog
 
+* *v 0.3.7*
+    * Compare body encode with UTF-8. Responce nokogiri with UTf-8 encode.
 * *v 0.3.6*
     * Add nokogumbo gem for work with HTML5 content. Now ng method responce nokogumbo object.
 * *v 0.3.4*
