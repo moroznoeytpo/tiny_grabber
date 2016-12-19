@@ -78,6 +78,21 @@ class TinyGrabber
     @agent.debug = debug
   end
 
+  # Read perfect_url agent attribute
+  #
+  def perfect_url
+    @agent.perfect_url
+  end
+
+  # Set perfect_url agent attribute
+  #
+  # @param perfect_url Removes additional processing url
+  #
+  def perfect_url=(perfect_url)
+    @agent.perfect_url = perfect_url
+  end
+
+
   # Read READ_TIMEOUT agent attribute
   #
   def read_timeout
