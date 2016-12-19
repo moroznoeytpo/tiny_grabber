@@ -130,6 +130,8 @@ tg.uri
 
 ## Changelog
 
+* *v 0.3.8*
+    * Added the perfect url. This attribute skips the conversion url
 * *v 0.3.7*
     * Compare body encode with UTF-8. Responce nokogiri with UTf-8 encode.
 * *v 0.3.6*

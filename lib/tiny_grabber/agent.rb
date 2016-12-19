@@ -24,6 +24,8 @@ class TinyGrabber
     attr_writer :follow_location
     # Uri
     attr_accessor :uri
+    # perfect url
+    attr_accessor :perfect_url
 
     #  Agent aliases given from http://www.useragentstring.com/pages/Chrome/
     AGENT_ALIASES = [
@@ -60,6 +62,7 @@ class TinyGrabber
       @basic_auth = {}
       @headers = {}
       @cookies = nil
+      @perfect_url = false
       @follow_location = false
       @read_timeout = 10
       # Initialize variable for URI object
@@ -249,10 +252,13 @@ class TinyGrabber
     # @param url Request link
     #
     def convert_to_uri(url)
-      # Remove anchor
-      url = url.gsub(/#.*\Z/, '')
-      # It's magic work with escaped url
-      @uri = URI(URI.escape(URI.unescape(url)))
+      unless @perfect_url
+        # Remove anchor
+        url = url.gsub(/#.*\Z/, '')
+        # It's magic work with escaped url
+        url = URI(URI.escape(URI.unescape(url)))
+      end
+      @uri = url
       @debug.save "-> [uri] = #{@uri}" if @debug.active
     end
 

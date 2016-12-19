@@ -21,6 +21,7 @@ class TinyGrabber
   def self.initialize(config = {})
     @agent = TinyGrabber::Agent.new
 
+    @agent.perfect_url = config[:perfect_url] if config[:perfect_url]
     @agent.debug = config[:debug] if config[:debug]
     @agent.read_timeout = config[:read_timeout] if config[:read_timeout]
     @agent.user_agent = config[:user_agent] if config[:user_agent]
