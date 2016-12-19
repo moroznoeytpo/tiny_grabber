@@ -21,6 +21,7 @@ class TinyGrabber
   def self.initialize(config = {})
     @agent = TinyGrabber::Agent.new
 
+    @agent.perfect_url = config[:perfect_url] if config[:perfect_url]
     @agent.debug = config[:debug] if config[:debug]
     @agent.read_timeout = config[:read_timeout] if config[:read_timeout]
     @agent.user_agent = config[:user_agent] if config[:user_agent]
@@ -76,6 +77,21 @@ class TinyGrabber
   def debug=(debug)
     @agent.debug = debug
   end
+
+  # Read perfect_url agent attribute
+  #
+  def perfect_url
+    @agent.perfect_url
+  end
+
+  # Set perfect_url agent attribute
+  #
+  # @param perfect_url Removes additional processing url
+  #
+  def perfect_url=(perfect_url)
+    @agent.perfect_url = perfect_url
+  end
+
 
   # Read READ_TIMEOUT agent attribute
   #
