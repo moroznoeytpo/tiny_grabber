@@ -256,9 +256,9 @@ class TinyGrabber
         # Remove anchor
         url = url.gsub(/#.*\Z/, '')
         # It's magic work with escaped url
-        url = URI(URI.escape(URI.unescape(url)))
+        url = URI.escape(URI.unescape(url))
       end
-      @uri = url
+      @uri = URI(url)
       @debug.save "-> [uri] = #{@uri}" if @debug.active
     end
 
