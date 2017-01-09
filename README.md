@@ -130,6 +130,8 @@ tg.uri
 
 ## Changelog
 
+* *v 0.4.0*
+  * Change reguired ruby version
 * *v 0.3.8*
     * Added the perfect url. This attribute skips the conversion url
 * *v 0.3.7*
@@ -216,4 +218,3 @@ Copyright © 2016 by Aleksandr Chernyshov (moroznoeytpo@gmail.com)
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
 Gem created by [quickleft tutorial](https://quickleft.com/blog/engineering-lunch-series-step-by-step-guide-to-building-your-first-ruby-gem/)
-
